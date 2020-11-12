@@ -1,27 +1,34 @@
-template <typename TK, typename TV>
+#include <vector>
+#include <string>
+#include <utility>
 
-class Hash
-{
+template <typename TK, typename TV>
+class Hash{
 private:    
     struct Node {
         int hashCode;
-        TK value;
+        TK key;
         TV value;
         Node* next;        
+		Node(int code,TK k,TV v):hashCode(code),key(k),value(v){}
     };
 
     int arrayLength;
-    int size;
     Node** array;
 
-   int getHashCode(TK key){
+   int getHashCode(std::string key){
        int cont = 1;
        int code = 0;
-       for(const &a : key){
+       for(const auto &a : key){
             code += cont * a;
             cont++;
        }
        return code;
+   }
+
+   void push_front(Node*& front, Node* newfront){
+        newfront->next=front;
+        front=newfront;
    }
 
 public:
@@ -37,10 +44,8 @@ public:
     {
         int hashCode = getHashCode(key);    //funcion hash
         int index = hashCode % arrayLength; //colisiones
-        while (array[index] != nullptr)
-            index = (index + 1) % arrayLength;
         if (array[index] == nullptr)
-            array[index] = new Node(hashCode, value);
+            array[index] = new Node(hashCode,key,value);
         else
             push_front(array[index], new Node(hashCode, key, value));
     }
@@ -49,8 +54,6 @@ public:
     {
         int hashCode = node->hashCode; 
         int index = hashCode % arrayLength;//colisiones         
-        while(array[index] != nullptr)
-            index = (index + 1) % arrayLength ;//podemos trabajar con saltos, PROFE:aqui no aplica saltos
         node->next = nullptr;
         if (array[index] == nullptr)
             array[index] = node;
@@ -69,7 +72,7 @@ public:
 
         for (int i = 0; i < tempL; i++)
         {            
-            for(Node* node = temp[i]; node != null; node = node->next)
+            for(Node* node = temp[i]; node != nullptr; node = node->next)
                 insert(node);
         }
 
@@ -79,11 +82,13 @@ public:
     TV operator[](TK key){
         int hashCode = getHashCode(key);
         int index = hashCode % arrayLength;
-        while (array[index] != nullptr && index < size)
-            index = (index + 1) % arrayLength;
-        if(array[index])
-            return array[index]->value;
-        return TV();
+        Node* iter=array[index];
+        while (iter != nullptr){
+            if(iter->hashCode==hashCode)
+               return iter->value;
+            iter = iter->next;
+        }
+	}
 
     TV find(TK key){
         int hashCode = getHashCode(key);
@@ -91,8 +96,8 @@ public:
         Node* iter=array[index];
 
         while (iter != nullptr){
-            if(iter.hashCode==hashCode)
-               return iter;
+            if(iter->hashCode==hashCode)
+               return iter->value;
             iter = iter->next;
         }
             
@@ -100,24 +105,40 @@ public:
     }
     
     bool remove(TK key){
-        int hashCode = getHashCode(key);
+		int hashCode = getHashCode(key);
         int index = hashCode % arrayLength;
-        auto unchain =[](Node* prev, Node* todelete){
+        auto unchain =[](Node* prev, Node*& todelete){
           prev->next=todelete->next;
+          todelete->next=nullptr;
+          delete todelete;
+          todelete = nullptr;
         };
-    }
+        Node* iter=array[index];
 
-    vector<TK> getAllKeys(){
-      int hashCode = getHashCode(key);
-      for(int iter = 0; iter > arrayLength; iter++){
-        cout << "Clave = " << getHashCode << endl;
-      }
+        while (iter->next != nullptr){
+            if((iter->next).hashCode==hashCode){
+                unchain(iter,iter->next);
+                return true;
+            }
+        }
+        return false;
+	}
+
+	std::vector<TK> getAllKeys(){
+		std::vector<TK> result;
+		for (int i = 0; i < arrayLength; i++){
+			for(Node* node = array[i]; node != nullptr; node = node->next)
+				result.push_back(node->key);
+		}
+		return result;
     }
     
-    vector<pairs<TK, TV>> getAll(){
-        // TODO
-        //hola
-        //buenas
-        
+	std::vector<std::pair<TK, TV>> getAll(){
+		std::vector<std::pair<TK, TV>> result;
+		for (int i = 0; i < arrayLength; i++){
+			for(Node* node = array[i]; node != nullptr; node = node->next)
+				result.push_back(std::make_pair(node->key,node->value));
+		}
+		return result;
     }
 };
