@@ -22,18 +22,12 @@ int main(){
     map.insert(par.first,par.second);
   auto stop = high_resolution_clock::now();
   auto duration = duration_cast<milliseconds>(stop - start);
-  cout << "Time:" << duration.count() << endl;
-  //cout << "Size of Hash Table: " << map.bucket_count() << endl;
-  /*
-  for (unsigned i = 0; i < map.bucket_count(); ++i)
-  {
-    cout << "bucket #" << i << " contains: ";
-    for (auto it = map.begin(i); it != map.end(i); ++it)
-      cout << "[" << it->first << ":" << it->second << "] ";
-    cout << "\n";
-  }  
-  //cout << "Hash Code:" << map.hash_function()("Heider") + 1 << endl;
-  */
+  cout <<map["ASMATH MOSAR"]<< endl;
+  cout <<map["SCIBA JENNIFER"]<< endl;
+  cout <<map["BASHUNGWA CHRISTINA"]<< endl;
+  cout <<map["BRISKI JOANNA"]<< endl;
+  //cout <<map[""]<< endl;
+  //cout <<map[""]<< endl;
 }
 
 vector<pair<string, string>> loadCSV(string file)

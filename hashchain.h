@@ -88,6 +88,7 @@ public:
                return iter->value;
             iter = iter->next;
         }
+		return TV();
 	}
 
     TV find(TK key){
